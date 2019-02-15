@@ -32,6 +32,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.iid.FirebaseInstanceId;
 
+import java.time.Month;
+import java.time.Year;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -119,7 +121,7 @@ public class AddFragment extends Fragment {
 
                 send_data_to_firebase(cdate,ctime,cactivity,cplace);
 
-                SetNotification notification = new SetNotification(setBody,setTitle,ctime);
+                SetNotification notification = new SetNotification(setBody,setTitle);
 
                 final Sender sender = new Sender(notification,Common.currentToken);
                 mService.sendNotification(sender)
@@ -152,7 +154,7 @@ public class AddFragment extends Fragment {
         datePickerDialog = new DatePickerDialog(Objects.requireNonNull(getContext()), new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int day) {
-                data_date.setText( day + "/" + (month+1) + "/" + year );
+                data_date.setText( day + "/" + (month+1) + "/" + (year+543) );
             }
         },Day,Month,Year);
 

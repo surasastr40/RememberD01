@@ -48,40 +48,40 @@ public class Adapter1 extends RecyclerView.Adapter<Adapter1.ViewHolder> {
 
             switch (position) {
                 case 0:
-                    img.setImageResource(R.drawable.one);
+                    img.setImageResource(R.drawable.ic_one);
                     break;
                 case 1:
-                    img.setImageResource(R.drawable.two);
+                    img.setImageResource(R.drawable.ic_two);
                     break;
                 case 2:
-                    img.setImageResource(R.drawable.three);
+                    img.setImageResource(R.drawable.ic_three);
                     break;
                 case 3:
-                    img.setImageResource(R.drawable.four);
+                    img.setImageResource(R.drawable.ic_four);
                     break;
                 case 4:
-                    img.setImageResource(R.drawable.five);
+                    img.setImageResource(R.drawable.ic_five);
                     break;
                 case 5:
-                    img.setImageResource(R.drawable.six);
+                    img.setImageResource(R.drawable.ic_six);
                     break;
                 case 6:
-                    img.setImageResource(R.drawable.seven);
+                    img.setImageResource(R.drawable.ic_seven);
                     break;
                 case 7:
-                    img.setImageResource(R.drawable.eight);
+                    img.setImageResource(R.drawable.ic_eight);
                     break;
                 case 8:
-                    img.setImageResource(R.drawable.nine);
+                    img.setImageResource(R.drawable.ic_nine);
                     break;
                 case 9:
-                    img.setImageResource(R.drawable.ten);
+                    img.setImageResource(R.drawable.ic_ten);
                     break;
                 case 10:
-                    img.setImageResource(R.drawable.eleven);
+                    img.setImageResource(R.drawable.ic_eleven);
                     break;
                 case 11:
-                    img.setImageResource(R.drawable.twelve);
+                    img.setImageResource(R.drawable.ic_twelve);
                     break;
             }
 
