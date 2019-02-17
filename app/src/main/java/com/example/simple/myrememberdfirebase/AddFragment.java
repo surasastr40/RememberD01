@@ -76,7 +76,7 @@ public class AddFragment extends Fragment {
         Common.currentToken = FirebaseInstanceId.getInstance().getToken();
         mService = Common.getFCMClient();
 
-        Log.d("MyToken", Common.currentToken);
+        Log.d("MyToken Me", Common.currentToken);
 
         db = FirebaseFirestore.getInstance();
         user = new HashMap<>();
