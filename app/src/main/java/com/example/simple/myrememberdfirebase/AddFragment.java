@@ -1,10 +1,14 @@
 package com.example.simple.myrememberdfirebase;
 
 
+import android.annotation.SuppressLint;
 import android.app.DialogFragment;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,11 +54,12 @@ public class AddFragment extends Fragment {
     private EditText data_place;
     private EditText data_activity;
 
+    private TextInputLayout date;
+
     FirebaseFirestore db;
     Map<String, Object> user;
     TimePickerDialog timePickerDialog;
     Calendar calendar = Calendar.getInstance();
-    String typeTime = "";
     String name_db = "db_remmemberD";
     APIService mService;
 
@@ -83,9 +88,11 @@ public class AddFragment extends Fragment {
         data_place = view.findViewById(R.id.data_place);
         data_activity = view.findViewById(R.id.data_activity);
 
+        date = view.findViewById(R.id.date);
+
         Button btn_submit = view.findViewById(R.id.btn_submit);
 
-        show_data_from_firebase();
+
 
         data_date.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,36 +114,32 @@ public class AddFragment extends Fragment {
         btn_submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (ValidateDate() && ValidateTime() && ValidatePlace() && ValidateActivity()) {
+                    String cdate = data_date.getText().toString();
+                    String ctime = data_time.getText().toString();
+                    String cplace = data_place.getText().toString();
+                    String cactivity = data_activity.getText().toString();
 
-                String cdate = data_date.getText().toString();
-                String ctime = data_time.getText().toString();
-                String cplace = data_place.getText().toString();
-                String cactivity = data_activity.getText().toString();
+                    String setTitle = " กิจกรรมของคุณ : วันที่ " + cdate + " เวลา " + ctime;
 
-                String setTitle = " กิจกรรมของคุณ : วันที่ " + cdate + " เวลา " + ctime;
-                String setBody = cactivity;
+                    send_data_to_firebase(cdate, ctime, cactivity, cplace);
 
-                send_data_to_firebase(cdate, ctime, cactivity, cplace);
+                    SetNotification notification = new SetNotification(cactivity, setTitle);
 
-                SetNotification notification = new SetNotification(setBody, setTitle);
+                    final Sender sender = new Sender(notification, Common.currentToken);
+                    mService.sendNotification(sender)
+                            .enqueue(new Callback<MyResponse>() {
+                                @Override
+                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
 
-                final Sender sender = new Sender(notification, Common.currentToken);
-                mService.sendNotification(sender)
-                        .enqueue(new Callback<MyResponse>() {
-                            @Override
-                            public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                }
 
-                                Toast.makeText(getContext(), "Success", Toast.LENGTH_SHORT).show();
+                                @Override
+                                public void onFailure(Call<MyResponse> call, Throwable t) {
 
-                            }
-
-                            @Override
-                            public void onFailure(Call<MyResponse> call, Throwable t) {
-
-                            }
-                        });
-
-
+                                }
+                            });
+                }
             }
         });
 
@@ -144,7 +147,6 @@ public class AddFragment extends Fragment {
     }
 
     private void set_TimePicker() {
-
         int Hour = calendar.get(Calendar.HOUR_OF_DAY);
         int Minute = calendar.get(Calendar.MINUTE);
         timePickerDialog = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
@@ -154,32 +156,58 @@ public class AddFragment extends Fragment {
             }
         }, Hour, Minute, DateFormat.is24HourFormat(getActivity()));
         timePickerDialog.show();
-
     }//set_TimePicker
 
-    private void show_data_from_firebase() {
 
-        db.collection("users")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        StringBuilder builder = new StringBuilder("ข้อความที่บันทึกไว้:\n\n");
+    private boolean ValidateDate() {
+        String date = data_date.getText().toString().trim();
+        if (date.isEmpty()) {
+            data_date.requestFocus();
+            data_date.setError("");
+            return false;
+        } else {
+            data_date.setError(null);
+            return true;
+        }
+    }//ValidateDate
 
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                builder.append("ลำดับ").append(document.getId()).append(": ");
-                                builder.append("\t").append(document.get("rmmb_activity")).append("\n\n");
+    private boolean ValidateTime() {
+        String time = data_time.getText().toString().trim();
+        if (time.isEmpty()) {
+            data_time.requestFocus();
+            data_time.setError("");
+            return false;
+        } else {
+            data_time.setError(null);
+            return true;
+        }
+    }//ValidateTime
 
-                            }
-//                            text_view.setText( builder );
-                        } else {
-                            Log.i(TAG, "Error getting documents.", task.getException());
-                        }
-                    }
-                });
+    private boolean ValidatePlace() {
+        String place = data_place.getText().toString().trim();
+        if (place.isEmpty()) {
+            data_place.requestFocus();
+            data_place.setError("กรุณากรอกสถานที่");
+            return false;
+        } else {
+            data_place.setError(null);
+            return true;
+        }
+    }//ValidatePlace
 
-    }//show_data_from_firebase -> show_data
+    private boolean ValidateActivity() {
+        String act = data_activity.getText().toString().trim();
+        if (act.isEmpty()) {
+            data_activity.requestFocus();
+            data_activity.setError("กรุณากรอกรายละเอียด");
+            return false;
+        } else {
+            data_activity.setError(null);
+            return true;
+        }
+    }//ValidatePlace
+
+
 
     private void send_data_to_firebase(String cdate, String ctime, String cactivity, String cplace) {
 
@@ -196,7 +224,9 @@ public class AddFragment extends Fragment {
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
-                        Log.d("MYTest", "DocumentSnapshot added with ID: " + documentReference.getId());
+                        Toast.makeText(getContext(), "บันทึกสำเร็จ :)", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                        startActivity(intent);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {

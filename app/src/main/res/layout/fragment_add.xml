@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/background_color"
     tools:context=".AddFragment">
 
@@ -30,18 +31,18 @@
                 android:id="@+id/date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-
                 <EditText
                     android:id="@+id/data_date"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:focusable="true"
-                    android:hint="วัน/เดือน/ปี"
+                    android:hint="@string/str_date"
                     android:imeOptions="actionGo"
                     android:inputType="text"
                     android:nextFocusForward="@id/data_time"
                     android:text=""
-                    android:focusableInTouchMode="false"/>
+                    android:focusableInTouchMode="false"
+                    tools:ignore="TextFields" />
             </android.support.design.widget.TextInputLayout>
         </LinearLayout>
 
@@ -67,7 +68,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:focusable="true"
-                    android:hint="เวลา"
+                    android:hint="@string/str_time"
                     android:imeOptions="actionGo"
                     android:inputType="text"
                     android:nextFocusDown="@id/data_place"
@@ -98,11 +99,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:focusable="true"
-                    android:hint="สถานที่"
+                    android:hint="@string/str_place"
                     android:imeOptions="actionGo"
                     android:inputType="text"
                     android:nextFocusDown="@id/data_activity"
-                    android:text="" />
+                    android:text=""/>
             </android.support.design.widget.TextInputLayout>
         </LinearLayout>
 
@@ -128,7 +129,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:focusable="true"
-                    android:hint="รายละเอียด"
+                    android:hint="@string/str_act"
                     android:imeOptions="actionGo"
                     android:inputType="text"
                     android:text="" />
@@ -140,7 +141,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="end">
-
             <Button
                 android:id="@+id/btn_submit"
                 android:layout_width="wrap_content"

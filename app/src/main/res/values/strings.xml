@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">RememberD</string>
+    <string name="str_date">วัน/เดือน/ปี</string>
+    <string name="str_time">เวลา</string>
+    <string name="str_place">สถานที่</string>
+    <string name="str_act">รายละเอียด</string>
 </resources>
