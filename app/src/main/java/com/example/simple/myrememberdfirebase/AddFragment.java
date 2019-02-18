@@ -13,7 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -71,8 +71,7 @@ public class AddFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Common.currentToken = FirebaseInstanceId.getInstance().getToken();
         mService = Common.getFCMClient();
 
@@ -114,32 +113,68 @@ public class AddFragment extends Fragment {
         btn_submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (ValidateDate() && ValidateTime() && ValidatePlace() && ValidateActivity()) {
+//                if (ValidateDate() && ValidateTime() && ValidatePlace() && ValidateActivity()) {
                     String cdate = data_date.getText().toString();
                     String ctime = data_time.getText().toString();
                     String cplace = data_place.getText().toString();
                     String cactivity = data_activity.getText().toString();
 
-                    String setTitle = " กิจกรรมของคุณ : วันที่ " + cdate + " เวลา " + ctime;
+//                    String setTitle = " กิจกรรมของคุณ : วันที่ " + cdate + " เวลา " + ctime;
 
                     send_data_to_firebase(cdate, ctime, cactivity, cplace);
 
-                    SetNotification notification = new SetNotification(cactivity, setTitle);
+                    String[] data_cdate = cdate.split("/");
+                    String[] data_ctime = ctime.split(":");
+                    String set_month = "";
+                    String time_hr = "";
+                    String time_minu = "";
 
-                    final Sender sender = new Sender(notification, Common.currentToken);
-                    mService.sendNotification(sender)
-                            .enqueue(new Callback<MyResponse>() {
-                                @Override
-                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                    String day = data_cdate[0];
+                    int month = Integer.parseInt(data_cdate[1]);
+                    if(month <= 9){
+                         set_month = "0" + month;
+                    }else{
+                        set_month += month ;
+                    }
+                    String year = data_cdate[2];
 
-                                }
+                    int hr_time = Integer.parseInt(data_ctime[0]);
+                    int minu_time = Integer.parseInt(data_ctime[1]);
 
-                                @Override
-                                public void onFailure(Call<MyResponse> call, Throwable t) {
+                    if(hr_time <= 9){
+                        time_hr = "0" + hr_time;
+                    }else {
+                        time_hr += hr_time;
+                    }
 
-                                }
-                            });
-                }
+                    if(minu_time <= 9){
+                        time_minu = "0" + minu_time;
+                    }else {
+                        time_minu += minu_time;
+                    }
+
+                    String set_time = time_hr + ":" + time_minu;
+
+                    MySQLConnect bg = new MySQLConnect(getActivity());
+                    bg.execute(cactivity,cplace,Common.currentToken,year,set_month,day,set_time);
+
+
+//                    SetNotification notification = new SetNotification(cactivity, setTitle);
+
+//                    final Sender sender = new Sender(notification, Common.currentToken);
+//                    mService.sendNotification(sender)
+//                            .enqueue(new Callback<MyResponse>() {
+//                                @Override
+//                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+//
+//                                }
+//
+//                                @Override
+//                                public void onFailure(Call<MyResponse> call, Throwable t) {
+//
+//                                }
+//                            });
+//                }
             }
         });
 
@@ -159,55 +194,6 @@ public class AddFragment extends Fragment {
     }//set_TimePicker
 
 
-    private boolean ValidateDate() {
-        String date = data_date.getText().toString().trim();
-        if (date.isEmpty()) {
-            data_date.requestFocus();
-            data_date.setError("");
-            return false;
-        } else {
-            data_date.setError(null);
-            return true;
-        }
-    }//ValidateDate
-
-    private boolean ValidateTime() {
-        String time = data_time.getText().toString().trim();
-        if (time.isEmpty()) {
-            data_time.requestFocus();
-            data_time.setError("");
-            return false;
-        } else {
-            data_time.setError(null);
-            return true;
-        }
-    }//ValidateTime
-
-    private boolean ValidatePlace() {
-        String place = data_place.getText().toString().trim();
-        if (place.isEmpty()) {
-            data_place.requestFocus();
-            data_place.setError("กรุณากรอกสถานที่");
-            return false;
-        } else {
-            data_place.setError(null);
-            return true;
-        }
-    }//ValidatePlace
-
-    private boolean ValidateActivity() {
-        String act = data_activity.getText().toString().trim();
-        if (act.isEmpty()) {
-            data_activity.requestFocus();
-            data_activity.setError("กรุณากรอกรายละเอียด");
-            return false;
-        } else {
-            data_activity.setError(null);
-            return true;
-        }
-    }//ValidatePlace
-
-
 
     private void send_data_to_firebase(String cdate, String ctime, String cactivity, String cplace) {
 
@@ -225,8 +211,8 @@ public class AddFragment extends Fragment {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         Toast.makeText(getContext(), "บันทึกสำเร็จ :)", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(getActivity(), MainActivity.class);
-                        startActivity(intent);
+//                        Intent intent = new Intent(getActivity(), MainActivity.class);
+//                        startActivity(intent);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -238,32 +224,5 @@ public class AddFragment extends Fragment {
 
     }//send_data_to_firebase -> insert_data
 
-    private void update_to_firebase(String rmmb_id, String cdate, String ctime, String cactivity, String cplace, Integer csettime) {
-        String strDate = (String) DateFormat.format("yyyy-MM-dd hh:mm", new Date());
-
-        DocumentReference noteRef2 = db.collection(name_db).document(rmmb_id);
-        noteRef2.update("rmmb_date", cdate, "rmmb_time", ctime,
-                "rmmb_place", cplace, "rmmb_activity", cactivity,
-                "rmmb_settime", csettime, "rmmb_create_time", strDate).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-
-            }
-        });
-
-    }//update_to_firebase -> update_data
-
-    private void delete_id_firebase(String rmmb_id) {
-
-        DocumentReference noteRef = db.collection(name_db).document(rmmb_id);
-        noteRef.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-
-
-            }
-        });//delete
-
-    }//delete_id_firebase -> delete_data
 
 }
