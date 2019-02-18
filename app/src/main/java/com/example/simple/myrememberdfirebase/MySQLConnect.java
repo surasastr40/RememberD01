@@ -59,7 +59,7 @@ public class MySQLConnect extends AsyncTask <String, Void,String> {
         String day = strings[5];
         String time = strings[6];
 
-        String connstr = "http://192.168.1.100/Android_Query/query_insert.php";
+        String connstr = "http://192.168.1.34/Android_Query/query_insert.php";
 
         try {
             URL url = new URL(connstr);
