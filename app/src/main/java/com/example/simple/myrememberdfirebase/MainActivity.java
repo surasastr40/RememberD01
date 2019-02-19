@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
          Volley.newRequestQueue(this).add(stringRequest);
 
          //จำนวนของการแจ้งเตือน ตามปี และเดือน
-        StringRequest stringRequestCount = new StringRequest(Request.Method.GET, connstr_query_count,
+        StringRequest stringRequestCount = new StringRequest(Request.Method.POST, connstr_query_count,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -120,7 +120,16 @@ public class MainActivity extends AppCompatActivity {
                         Log.d("asdasdasd", String.valueOf(error));
                         // Handle error
                     }
-                });
+                }){
+
+                    @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+                        Map<String, String> postMap2 = new HashMap<>();
+                        postMap2.put("year", "2562");
+                        //..... Add as many key value pairs in the map as necessary for your request
+                        return postMap2;
+                    }
+                };
 
         Volley.newRequestQueue(this).add(stringRequestCount);
 
