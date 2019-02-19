@@ -19,11 +19,13 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.simple.myrememberdfirebase.Remote.APIService;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,13 +40,17 @@ public class MainActivity extends AppCompatActivity {
 
     FirebaseFirestore db;
     Map<String, Object> user;
-    private static final String connstr_query = "http://192.168.1.34/Android_Query/get_query.php";
-    private static final String connstr_query_count = "http://192.168.1.34/Android_Query/get_query_count.php";
+    private static final String connstr_query = "http://10.70.20.112/Android_Query/get_query.php";
+    private static final String connstr_query_count = "http://10.70.20.112/Android_Query/get_query_count.php";
+    private static final String connstr_query_delete = "http://10.70.20.112/Android_Query/query_delete.php";
+    private static final String connstr_query_update = "http://10.70.20.112/Android_Query/query_update.php";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Common.currentToken = FirebaseInstanceId.getInstance().getToken();
 
         //ข้อมูลของการแจ้งเตือนในแต่ละปี แต่ละเดือน
         StringRequest stringRequest = new StringRequest(Request.Method.POST, connstr_query,
@@ -82,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
                             Map<String, String> postMap = new HashMap<>();
                             postMap.put("year", "2562");
                             postMap.put("month", "02");
-                            //..... Add as many key value pairs in the map as necessary for your request
+                            postMap.put("token", Common.currentToken);
                             return postMap;
                         }
                 };
@@ -126,12 +132,77 @@ public class MainActivity extends AppCompatActivity {
                     protected Map<String, String> getParams() throws AuthFailureError {
                         Map<String, String> postMap2 = new HashMap<>();
                         postMap2.put("year", "2562");
-                        //..... Add as many key value pairs in the map as necessary for your request
+                        postMap2.put("token", Common.currentToken);
+
                         return postMap2;
                     }
                 };
 
         Volley.newRequestQueue(this).add(stringRequestCount);
+
+        //ลบข้อมูล
+        StringRequest stringRequestDelete = new StringRequest(Request.Method.POST, connstr_query_delete,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("my_delete", "delete Ok");
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("my_delete", String.valueOf(error));
+                        // Handle error
+                    }
+                }){
+
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> postMap3 = new HashMap<>();
+                postMap3.put("id_rmmb", "14");
+
+                return postMap3;
+            }
+        };
+
+        Volley.newRequestQueue(this).add(stringRequestDelete);
+
+        //อัพเดทข้อมูล
+        StringRequest stringRequestUpdate = new StringRequest(Request.Method.POST, connstr_query_update,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("my_update", "delete Ok");
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("my_update", String.valueOf(error));
+                        // Handle error
+                    }
+                }){
+
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> postMap4 = new HashMap<>();
+                postMap4.put("id_rmmb", "14");
+                postMap4.put("activity", "14");
+                postMap4.put("place", "14");
+                postMap4.put("token", "14");
+                postMap4.put("year", "14");
+                postMap4.put("month", "14");
+                postMap4.put("day", "14");
+                postMap4.put("time", "14");
+
+                return postMap4;
+            }
+        };
+
+        Volley.newRequestQueue(this).add(stringRequestUpdate);
+
+
+
 
 
         db = FirebaseFirestore.getInstance();
